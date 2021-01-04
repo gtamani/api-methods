@@ -12,11 +12,16 @@ def get_intra(symbol,interval = "15min"):
     return set_df(data)
 
 
-def get_daily(symbol):
+def get_daily(symbol,extended = False):
     """
     DataFrame con datos OHCL. No ajustado por dividendos
     """
-    params = {"function": "TIME_SERIES_DAILY", "symbol": symbol, "apikey": "YELY5RODQVJZX36J"}
+    if extended:
+        outputsize = "full"
+    else:
+        outputsize = "compact"
+    params = {"function": "TIME_SERIES_DAILY", "symbol": symbol, "apikey": "YELY5RODQVJZX36J",
+              "outputsize":outputsize}
     url = "https://www.alphavantage.co/query"
     r = requests.get(url=url, params=params)
     data = r.json()["Time Series (Daily)"]
@@ -29,6 +34,7 @@ def set_df(data):
     """
     df = pd.DataFrame.from_dict(data, orient="index")
     df.index.name, df.columns = "Date", ["Open", "High", "Low", "Close", "Volume"]
+    df = df.astype("float")
     df = df.sort_values("Date", ascending=True)
     df.index = pd.to_datetime(df.index)
     return df
@@ -124,5 +130,37 @@ def ema(symbol,time_period,last = True,series_type = "close",interval="daily"):
         df.index.name = "Date"
         df.index = pd.to_datetime(df.index)
         return df
+
+def macd(symbol,series_type="close"):
+    """
+    Indicador técnico de convergencia/divergencia de las medias móviles.
+    Devuelve las dos lineas del MACD junto al histograma sobre una serie historica de un activo pasado como input.
+    """
+    url= "https://www.alphavantage.co/query"
+    params = {"function":"MACD","symbol":symbol,"interval":"daily","series_type":series_type,
+              "apikey":"YELY5RODQVJZX36J"}
+    r = requests.get(url=url,params=params)
+    df = pd.DataFrame.from_dict(r.json()["Technical Analysis: MACD"])
+    df = df.T #matriz transpuesta
+    df = df.rename(columns={"MACD_Hist":"Histograma","MACD_Signal":"MACD señal"})
+    df.index.name = "Date"
+    df.index = pd.to_datetime(df.index)
+    df = df.astype("float")
+    df = df.sort_values("Date",ascending=True)
+    return df
+
+def rsi(symbol,series_type="close",time_period=60):
+    """
+    Relative Strenght Index (Índice de fuerza relativa)
+    """
+    url = "https://www.alphavantage.co/query"
+    params = {"function": "RSI", "symbol": symbol, "interval": "daily", "series_type": series_type,
+              "apikey": "YELY5RODQVJZX36J", "time_period":time_period}
+    r = requests.get(url=url, params=params)
+    df = pd.DataFrame.from_dict(r.json()["Technical Analysis: RSI"],orient="index")
+    df.index.name = "Date"
+    df = df.astype("float")
+    df.index = pd.to_datetime(df.index)
+    return df
 
 
