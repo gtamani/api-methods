@@ -163,4 +163,5 @@ def rsi(symbol,series_type="close",time_period=60):
     df.index = pd.to_datetime(df.index)
     return df
 
-
+if __name__ == "__main__":
+    pass

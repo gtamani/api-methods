@@ -72,13 +72,14 @@ def ipo_calendar(toDate = "2022-01-01"):
 
 
 
-print(datetime.today().strftime("%Y-%m-%d"))
-print(ipo_calendar())
+if __name__ == "__main__":
+    print(datetime.today().strftime("%Y-%m-%d"))
+    print(ipo_calendar())
 
 
 
 
 
-#exchange("BA").to_excel("BA assets.xls")
-#print([(market_cap(i),i) for i in similars("KO")])
+    #exchange("BA").to_excel("BA assets.xls")
+    #print([(market_cap(i),i) for i in similars("KO")])
 
