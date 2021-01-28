@@ -23,6 +23,7 @@ def getToken():
     r = requests.post(url=url, data=data)
     access = json.loads(r.text)
 
+    print()
     return access["access_token"], datetime.datetime.strptime(access[".expires"],"%a, %d %b %Y %H:%M:%S GMT")
 
 def isTokenAvailable():
@@ -38,73 +39,121 @@ def getPrices(instrumento="AL29D"):
     r = requests.get(url="https://api.invertironline.com/api/v2/bCBA/Titulos/"+instrumento+"/Cotizacion",
                       headers= headers)
 
-    data = json.loads(r.text)
+    data = {"instrument": instrumento,
+            "price": None,
+            "cantBid": None,
+            "Bid": None,
+            "Ask": None,
+            "cantAsk": None}
 
-    data = {"instrument" : instrumento,
-            "price" : data["ultimoPrecio"],
-            "cantBid" : int(data["puntas"][0]["cantidadCompra"]),
-            "Bid": data["puntas"][0]["precioCompra"],
-            "Ask": data["puntas"][0]["precioVenta"],
-            "cantAsk": int(data["puntas"][0]["cantidadVenta"])}
-    print(data)
+    if str(r.content) != "b''": # Si el json no viene vacío...
+        jsonloads = json.loads(r.text)
+
+        data["price"] = jsonloads["ultimoPrecio"]
+        data["cantBid"] = int(jsonloads["puntas"][0]["cantidadCompra"])
+        data["Bid"] = jsonloads["puntas"][0]["precioCompra"]
+        data["Ask"] = jsonloads["puntas"][0]["precioVenta"]
+        data["cantAsk"] = int(jsonloads["puntas"][0]["cantidadVenta"])
+
     return data
 
 
+
+
 if __name__ == "__main__":
+    """
+    Bot que detecta oportunidades de arbitraje en MEP de bonos y CEDEARS
+    """
+
     expires_in = None
-
-    """
-    mep = local["Ask"]/especieD["Bid"] COMPRA MEP PUNTAS
-    mep = (local["Ask"]*(1+cometa))/(especieD["Bid"]*(1-cometa)) COMPRA MEP PUNTAS CON COMISION
-    mep = local["price"]/especieD["price"] COMPRA MEP LAST PRICE
-    
-    op1 = Operación 1 - Compro bono A en pesos.
-    op2 = Operación 2 - Vendo bono A en dolares.
-    op3 = Operación 3 - Vendo bono B en dolares.
-    op4 = Operación 4 - Compro bono A en pesos.
-    
-    """
-
-    op1,op2,op3,op4,mepBarato,mepCaro = None,None,None,None,None,None
+    op1,op2,op3,op4,mepBarato,mepCaro,a,b = None,None,None,None,None,None,None,None
     cometa = 0.005
+    disponible_pesos, disponible_dolares = 100000, 0
+    inicio = 100000
 
-    for i in ["AL29","AL30","AL35","AE38","AL41"]:
+    #equity = ["AL29", "AL30", "AL35", "AE38", "AL41", "AAPL", "AMZN", "DISN", "INTC", "KO", "MELI"]
+    equity = ["AL29","AL30"]
+
+    for i in equity:
         local = getPrices(i)
         especieD = getPrices(i+"D")
 
-        mepC = round((local["Ask"]/especieD["Bid"]),2)
-        mepV = round((local["Bid"]/especieD["Ask"]),2)
+        try:
+            if local["Ask"] != 0:
+                mepC = round((local["Ask"]/especieD["Bid"]),2)
+        except:
+            mepC = None
 
-        if mepBarato is None or mepC < mepBarato:
+        try:
+            mepV = round((local["Bid"] / especieD["Ask"]), 2)
+        except:
+            mepV = None
+
+        try:
+            lastMep = round(local["price"] / especieD["price"], 2)
+        except:
+            lastMep = None
+
+
+        if mepC is not None and (mepBarato is None or mepC < mepBarato):
             mepBarato = mepC
             op1,op2 = local["Ask"],especieD["Bid"]
-        if mepCaro is None or mepV > mepCaro:
+            a = local["instrument"]
+        if mepV is not None and (mepCaro is None or mepV > mepCaro):
             mepCaro = mepV
-            op3,op4 = local["Bid"],especieD["Ask"]
+            op3,op4 = especieD["Bid"],local["Ask"]
+            b = local["instrument"]
 
-        print("mep barato: ",mepBarato," - mep caro: ",mepCaro)
 
-        comision = local["Ask"]*cometa
-        comision2 = especieD["Bid"]*cometa
-        mep = round(local["price"]/especieD["price"],2)
+        #print("mep barato: ",mepBarato," - mep caro: ",mepCaro)
+        #print(i,"LAST MEP: ",lastMep," - MEP COMPRA: ",mepC," - MEP VENTA: ",mepV,"      $")
+        #print()
 
-        print(i," MEP: ",mep," - MEP COMPRA: ",mepC," - MEP VENTA: ",mepV,"      $",comision," USD",comision2)
 
-    disponible_pesos = 100000
     print()
-    print(op1,op2,op3,op4)
+
+    #print(op1,op2,op3,op4)
 
     op1 *= 1+cometa
-    op4 *= 1+cometa
+    op4 *= 1-cometa
     op2 *= 1-cometa
-    op3 *= 1-cometa
+    op3 *= 1+cometa
 
-    print(op1,op2,op3,op4)
+    #print(op1,op2,op3,op4)
 
     cantop1 = int(disponible_pesos/op1)
 
+    print()
 
-    
+    df = pd.DataFrame(columns=["Precio","Cantidad","Pesos","Dolares"])
+    df.loc["0. Inicio"] = [0,0,disponible_pesos,disponible_dolares]
 
-    df = pd.DataFrame(columns=["Precio","Cantidad","Resto"])
-    df.loc["1. Compro A en pesos"] = [op1,cantop1,disponible_pesos-(op1*cantop1)]
+    disponible_pesos -= (op1 * cantop1)
+
+    df.loc["1. Compro "+a] = [op1,cantop1,disponible_pesos,0]
+
+    disponible_dolares += cantop1*op2
+
+    df.loc["2. Vendo "+a+"D"] = [op2,cantop1,disponible_pesos,disponible_dolares]
+
+    cantop3 = int(disponible_dolares / op3)
+    disponible_dolares -= op3 * cantop3
+
+    df.loc["3. Compro "+b+"D"] = [op3,cantop3,disponible_pesos,disponible_dolares]
+
+    disponible_pesos += cantop3 * op4
+
+    df.loc["4. Vendo "+b] = [op4,cantop3,disponible_pesos,disponible_dolares]
+
+    resultado = disponible_pesos + disponible_dolares * mepBarato
+
+    if resultado > inicio:
+        print(df)
+        print()
+        print("Obtengo: $", round(resultado,2))
+        print("Ganancia: $", round(resultado-inicio,2))
+        print("Resultado arbitraje: %", round(((resultado/inicio)-1)*100,2))
+    else:
+        print("Por el momento, no hay oportunidades de arbitraje.")
+
+
