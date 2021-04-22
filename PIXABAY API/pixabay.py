@@ -27,7 +27,7 @@ def downloadVideo(keyWords,quantity=1,quality=4):
     keyWords = keyWords.replace(" ","+")
     url="https://pixabay.com/api/videos/"
     apikey = getKey()
-    params = {"key":apikey,"lang":"en","q":keyWords}
+    params = {"key":apikey,"lang":"es","q":keyWords}
 
     r = requests.get(url=url,params=params)
     photos = [i["videos"][quality]["url"] for i in r.json()["hits"]]    
@@ -45,3 +45,4 @@ def getKey():
     with open("pixabayToken.txt","r") as handler:
         return str(handler.read())
 
+downloadVideo("bucket",3)
