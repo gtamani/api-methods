@@ -1,11 +1,13 @@
-import requests
+import requests, os
 import pandas as pd
 import json
 from datetime import datetime
+from dotenv import load_dotenv
 
-token = "bvmbb3f48v6trsjub7j0"
-sandbox = "sandbox_bvmbb3f48v6trsjub7jg"
+load_dotenv()
 
+# Insert your key on this variable 
+token = os.environ.get("FINNHUB_KEY")
 
 
 def exchange(mkt):

@@ -6,7 +6,12 @@ Follow this easy steps to start using pixabay API
 
 1. Log in pixabay  and get the API token --> https://pixabay.com/api/docs/
 
-2. Copy that token and include it in "pixabayToken.txt"
+2. Copy that token and include it in "pixabay.py"
+
+```python
+# Insert your key on this variable (line 7)
+apikey = "here_include_your_key"
+```
 
 
 Then, you must include this file in your proyect and import pixabay functions
@@ -18,7 +23,7 @@ import pixabay
 from pixabay import downloadImg, downloadVideos
 ```
 
-<br><br>
+<br>
 <h1>Functions</h1>
 <h2>Download Images</h2>
 

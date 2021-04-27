@@ -1,9 +1,12 @@
 import requests,json
-import datetime
+import datetime,os
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 
 """
-Definir todo como una clase
+Load your credentials on line 20 and 21
 """
 
 def getToken():
@@ -13,8 +16,9 @@ def getToken():
 
     url = "https://api.invertironline.com/token"
 
-    user = input("User: ")
-    password = input("Password: ")
+    # Insert your credentials on these variables 
+    user = os.environ.get("INVERTIR_ONLINE_USER")
+    password = os.environ.get("INVERTIR_ONLINE_PASSWORD")
 
     data = {"username":user,
             "password":password,

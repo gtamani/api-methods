@@ -1,8 +1,11 @@
 import requests, pandas as pd,datetime as dt
+import os
+from dotenv import load_dotenv
 
-key = "cxspkxw8d4VwGzt0Bvrb3bbp6nqnIRfOynEpxN3AtZRMRwgbKvv9zPbYwZ8b0SdB"
-secret_key = "bFSGyEbPrzxkrpTSOdlBDYb3VJBJX6sjU13tW6BieA783MItM2greINjncpXfwco"
+load_dotenv()
 
+# Insert your key on this variable 
+key = os.environ.get("BINANCE_KEY")
 
 
 def getInfo():
@@ -74,6 +77,7 @@ def timestamp(year,month,day):
 
 if __name__ == "__main__":
     #historical("BTCUSDT","1m",1610296965000)
+    pass
 
 
 

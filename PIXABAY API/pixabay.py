@@ -1,10 +1,15 @@
 import json, requests, os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Insert your key on this variable 
+apikey = os.environ.get("PIXABAY_KEY")
 
 
 def downloadImg(keyWords,quantity=1):
     keyWords = keyWords.replace(" ","+")
     url="https://pixabay.com/api"
-    apikey = getKey()
     params = {"key":apikey,"lang":"en","q":keyWords}
 
     r = requests.get(url=url,params=params)
@@ -26,7 +31,6 @@ def downloadVideo(keyWords,quantity=1,quality=4):
     quality = videoSize[quality]
     keyWords = keyWords.replace(" ","+")
     url="https://pixabay.com/api/videos/"
-    apikey = getKey()
     params = {"key":apikey,"lang":"es","q":keyWords}
 
     r = requests.get(url=url,params=params)
@@ -41,8 +45,4 @@ def downloadVideo(keyWords,quantity=1,quality=4):
     print("Saved!")
     
 
-def getKey():
-    with open("pixabayToken.txt","r") as handler:
-        return str(handler.read())
-
-downloadVideo("bucket",3)
+#downloadVideo("bucket",3)
