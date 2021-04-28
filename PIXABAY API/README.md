@@ -20,7 +20,7 @@ Then, you must include this file in your proyect and import pixabay functions
 import pixabay
 ```
 ```python
-from pixabay import downloadImg, downloadVideos
+from pixabay import downloadImg, downloadVideo
 ```
 
 <br>
