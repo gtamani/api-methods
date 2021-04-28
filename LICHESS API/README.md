@@ -1,4 +1,4 @@
-<h1>Pixabay API</h1>
+<h1>Lichess API</h1>
 
 lichess.py has the best functions either to analize your games or to create your own bot
 
@@ -6,7 +6,7 @@ Follow this easy steps to start using lichess API
 
 1. Log in lichess and get the API token --> https://lichess.org/
 
-2. Copy that token and include it in "pixabay.py"
+2. Copy that token and include it in "lichess.py"
 
 ```python
 # Insert your key on this variable (line 7)
