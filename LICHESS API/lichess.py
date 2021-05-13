@@ -93,7 +93,6 @@ def get_fen_syntax(board, turn):
         fen += "/"
     fen = fen[:-1]
     fen += " "+turn+" KQkq - 0 1"
-    turn = "w" if turn == "b" else "b"
     return fen, turn
 
 def move_piece(board,coord):
@@ -136,16 +135,24 @@ def move_piece(board,coord):
 
 board = np.array([[12,13,14,15,16,14,13,12,],[11]*8,[0]*8,[0]*8,[0]*8,[0]*8,[1]*8,[2,3,4,5,6,4,3,2]])
 
-print(board)
 
+
+
+player = input("are you black or whites? (w/b) ")
 turn= "w"
 switch = True
 move = 1
 
 while switch:
     print(turn,"turn.")
-    fen_board,turn = get_fen_syntax(board,turn)
-    next_move= best_move(fen_board)
+    if turn != player:
+        next_move = [input("insert opponent move -> ")]
+    else:
+        fen_board,turn = get_fen_syntax(board,turn)
+        next_move= best_move(fen_board)
+        
+    print("next move: ",next_move)
+
     if next_move is None:
         print("No more to show!")
         switch = False
@@ -153,4 +160,5 @@ while switch:
 
         board = move_piece(board, next_move[0])
         move += 1
+        turn = "w" if turn == "b" else "b"
         print(board,"\n\n")
