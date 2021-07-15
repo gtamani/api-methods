@@ -9,8 +9,8 @@ class Composer:
 
     def __init__(self,crotchet):
         self.framerate = 44100
-        self.frequencies = [self.get_frequency(note,1) for note in range(1,13)]
-        self.frequencies += [self.get_frequency(note,2) for note in range(1,13)]
+        self.frequencies = [self.get_frequency(note,3) for note in range(1,13)]
+        self.frequencies += [self.get_frequency(note,4) for note in range(1,13)]
         self.crotchet = crotchet
         self.notes = {"C#":1,"C":0,"D#":3,"D":2,"E":4,"F#":6,"F":5,"G#":8,"G":7,"A#":10,"A":9,"B":11}
         self.triads = {"dim":[0,3,6],"M":[0,4,7],"m":[0,3,7],"aug":[0,4,8]}
@@ -22,7 +22,7 @@ class Composer:
         return 440*((2**(1/12)) ** expo)
 
     def beep(self,frequency,time):
-        t = np.linspace(0,time/100,int(self.framerate*time/1000))
+        t = np.linspace(0,time/1000,int(self.framerate*time/1000))
         wave = np.sin(2*np.pi * frequency * t)
         sd.play(wave,self.framerate)
         sd.wait()

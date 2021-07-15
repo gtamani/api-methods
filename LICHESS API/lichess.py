@@ -95,6 +95,12 @@ def get_fen_syntax(board, turn):
     fen += " "+turn+" KQkq - 0 1"
     return fen, turn
 
+board = np.array([[12,13,14,15,16,14,13,12,],[11]*8,[0]*8,[0]*8,[0]*8,[0]*8,[1]*8,[2,3,4,5,6,4,3,2]])
+a,b =get_fen_syntax(board,"w")
+print(a)
+
+
+
 def move_piece(board,coord):
 
     letter_to_num = {"a":0,"b":1,"c":2,"d":3,"e":4,"f":5,"g":6,"h":7}
@@ -162,3 +168,5 @@ while switch:
         move += 1
         turn = "w" if turn == "b" else "b"
         print(board,"\n\n")
+
+
