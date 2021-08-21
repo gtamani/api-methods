@@ -38,6 +38,15 @@ def random_words(language="es"):
     random_search = random_search.split("-")[0]
     return random_search.replace("\\xc3\\xa9","é").replace("\\xc3\\xad","í")
 
+def random_sentence(quantity=1,language="es"):
+    """
+    Get sentences with random words.
+    """
+    endpoint= "https://api.generadordni.es/v2/text/paragraphs?results="+str(quantity)+"&sentences=1&language="+language
+    
+    r = requests.get(url=endpoint)
+    return r.json()
+
 def wiki(keyword,language="es"):
     """
     Search an article using Wikipedia Python's library.
@@ -63,7 +72,14 @@ def remove_spans(text):
             return new_text + left+". "
 
 if __name__ == "__main__":
+    
+    
+
+    with open("example.txt","w",encoding="utf-8") as handler:
+        handler.write("\n".join(random_sentence(100)))
+    """
     random = random_words()
     print(search(random))
+    """
     
     
